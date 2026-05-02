@@ -11,6 +11,7 @@ import {
 
 const Dashboard = () => {
   const [weather, setWeather] = useState(null);
+  const [error, setError] = useState(false);
 
   const data = [
     { name: "Carbon", value: 24 },
@@ -21,12 +22,16 @@ const Dashboard = () => {
   useEffect(() => {
     axios
       .get(
-        `${import.meta.env.VITE_API_URL}?latitude=28.61&longitude=77.23&current_weather=true`
+        "https://api.open-meteo.com/v1/forecast?latitude=28.61&longitude=77.23&current_weather=true"
       )
       .then((res) => {
+        console.log("API DATA:", res.data);
         setWeather(res.data.current_weather);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("API ERROR:", err);
+        setError(true);
+      });
   }, []);
 
   return (
@@ -74,7 +79,11 @@ const Dashboard = () => {
           Live Weather 🌤️
         </h2>
 
-        {weather ? (
+        {error ? (
+          <p className="text-red-400">
+            Failed to load weather data ❌
+          </p>
+        ) : weather ? (
           <div className="space-y-1">
             <p className="text-xl">
               🌡 Temperature:{" "}
@@ -91,7 +100,7 @@ const Dashboard = () => {
             </p>
 
             <p className="text-sm text-gray-400 mt-2">
-              Real-time data powered by API
+              Real-time weather data fetched successfully ✔
             </p>
           </div>
         ) : (
